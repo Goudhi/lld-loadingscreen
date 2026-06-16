@@ -458,6 +458,469 @@ function DownloadingFile(filename) {
     document.getElementById('filename').textContent = '⬇  ' + filename;
 }
 
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Chargement…</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; }
+
+body {
+    font-family: 'Nunito', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: white;
+    user-select: none;
+    background:
+        radial-gradient(circle at 50% 18%, #2a78c8 0%, #1a5ea8 32%, #0c386b 68%, #08284d 100%);
+}
+
+.slideshow { position:fixed; top:0; left:0; right:0; bottom:0; z-index:0; overflow:hidden; }
+.slide {
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.4s ease-in-out;
+    transform: scale(1.06);
+    animation: kenburns 18s ease-in-out infinite alternate;
+}
+.slide.active { opacity: 1; }
+@keyframes kenburns {
+    from { transform: scale(1.04); }
+    to   { transform: scale(1.12); }
+}
+
+.scrim {
+    position:fixed; top:0; left:0; right:0; bottom:0; z-index:1;
+    background: linear-gradient(
+        180deg,
+        rgba(8,40,77,0.55) 0%,
+        rgba(8,40,77,0.15) 30%,
+        rgba(8,40,77,0.25) 60%,
+        rgba(8,40,77,0.85) 100%);
+}
+
+.welcome {
+    position: fixed; top:0; left:0; right:0; bottom:0; z-index:6;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:10px;
+    pointer-events:none;
+    animation: welcomeIntro 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.welcome.hide { animation: welcomeOut 0.8s ease-in forwards; }
+@keyframes welcomeIntro {
+    from { opacity:0; transform: scale(0.85); }
+    to   { opacity:1; transform: scale(1); }
+}
+@keyframes welcomeOut {
+    from { opacity:1; transform: scale(1); }
+    to   { opacity:0; transform: scale(1.08); }
+}
+.welcome .hi {
+    font-size:22px; font-weight:800; color:#5db8ff; letter-spacing:1px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    text-transform:uppercase;
+}
+.welcome .brand-logo {
+    width: auto; max-width: 34vw; max-height: 140px;
+    filter: drop-shadow(0 5px 12px rgba(0,0,0,0.55));
+    animation: brandBob 2.6s ease-in-out infinite;
+}
+@keyframes brandBob {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-8px); }
+}
+
+.character {
+    position: fixed; right: 2vw; bottom: -2vh; z-index: 3;
+    height: 78vh; max-height: 720px;
+    display: flex; align-items: flex-end;
+    pointer-events: none;
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.character.shown { opacity: 1; transform: translateY(0); }
+.character.left { left: 2vw; right: auto; justify-content: flex-start; }
+.character img {
+    height: 100%; width: auto;
+    filter: drop-shadow(0 8px 22px rgba(0,0,0,0.6));
+}
+
+.bubble-tip {
+    position: absolute;
+    bottom: 71%;
+    right: 35%;
+    z-index: 5;
+    max-width: 280px; min-width: 160px;
+    background: linear-gradient(180deg, #ffffff, #eaf3ff);
+    border: 2px solid #5db8ff;
+    border-radius: 18px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 0 #b8d6f5, 0 10px 20px rgba(0,0,0,0.45);
+    animation: bubblePop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.bubble-tip::after {
+    content:""; position:absolute; right:-16px; bottom:16px;
+    width:0; height:0;
+    border-top:20px solid transparent;
+    border-bottom:8px solid transparent;
+    border-left:20px solid #ffffff;
+}
+.bubble-tip::before {
+    content:""; position:absolute; right:-21px; bottom:13px;
+    width:0; height:0;
+    border-top:23px solid transparent;
+    border-bottom:9px solid transparent;
+    border-left:24px solid #5db8ff;
+}
+@keyframes bubblePop {
+    from { opacity:0; transform: scale(0.7) translateY(8px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+}
+.bubble-tip.left { right: auto; left: 64%; bottom: 72%; }
+.bubble-tip.left::after {
+    right: auto; left:-16px; bottom:16px;
+    border-top:20px solid transparent;
+    border-bottom:8px solid transparent;
+    border-right:20px solid #ffffff;
+    border-left:0;
+}
+.bubble-tip.left::before {
+    right: auto; left:-21px; bottom:13px;
+    border-top:23px solid transparent;
+    border-bottom:9px solid transparent;
+    border-right:24px solid #5db8ff;
+    border-left:0;
+}
+.bubble-tip .tip-v {
+    font-size:15px; font-weight:800; line-height:1.3;
+    color:#0c386b;
+}
+.bubble-tip.swap .tip-v { animation: tipSwap 0.5s ease; }
+@keyframes tipSwap {
+    from { opacity:0; transform: translateY(6px); }
+    to   { opacity:1; transform: translateY(0); }
+}
+
+.bar-zone {
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 7%;
+    z-index: 5;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 0 6vw;
+    animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes popIn {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+}
+
+.bar-head {
+    width: 100%; max-width: 760px;
+    display:flex; align-items:baseline; justify-content:space-between;
+}
+#status {
+    font-size:20px; font-weight:800; color:#ffffff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.45);
+    display:flex; align-items:center; gap:10px;
+}
+.dots span {
+    display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:#ffffff; margin:0 1px;
+    animation: blink 1.2s ease-in-out infinite;
+}
+.dots span:nth-child(2){ animation-delay:0.2s; }
+.dots span:nth-child(3){ animation-delay:0.4s; }
+@keyframes blink { 0%,100%{ opacity:0.25; transform:translateY(0);} 50%{ opacity:1; transform:translateY(-3px);} }
+
+#percent {
+    font-size:26px; font-weight:800; color:#5db8ff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.45);
+}
+
+.stat-bar-container {
+    position:relative;
+    width: 100%; max-width: 760px;
+    background-color: #0c386b;
+    border-radius: 16px;
+    height: 30px;
+    overflow: hidden;
+    border: 1px solid #5db8ff;
+    box-shadow: 0 3px 4px rgba(0,0,0,0.5), 0 6px 0 #0f437f;
+}
+#fill {
+    position:relative;
+    height: 100%;
+    width: 0%;
+    border-radius: 16px;
+    background: linear-gradient(to bottom, #4a9aff, #1d65c1);
+    box-shadow: 0 2px 4px rgba(255,255,255,0.25);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#fill::after {
+    content:""; position:absolute; top:0; left:0; right:0; bottom:0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.20) 25%, transparent 25%,
+        transparent 50%, rgba(255,255,255,0.20) 50%,
+        rgba(255,255,255,0.20) 75%, transparent 75%);
+    background-size: 34px 34px;
+    animation: stripes 0.7s linear infinite;
+    border-radius: 16px;
+}
+@keyframes stripes { from{ background-position:0 0; } to{ background-position:34px 0; } }
+
+.bar-foot {
+    width: 100%; max-width: 760px;
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:13px; font-weight:700; color:#ffffffb0;
+}
+#filename {
+    min-width:0; flex:1; margin-right:16px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#files b { color:#dbeaff; }
+</style>
+</head>
+<body>
+
+<div class="slideshow" id="slideshow"></div>
+<div class="scrim"></div>
+
+<div class="welcome" id="welcome">
+    <div class="hi">Bienvenue sur</div>
+    <img class="brand-logo" src="https://i.imgur.com/nYA7Lhc.png" alt="LaLaLand">
+</div>
+
+<div class="character left" id="character-left">
+    <div class="bubble-tip left" id="tip-left">
+        <span class="tip-v" id="tip-left-text"></span>
+    </div>
+</div>
+
+<div class="character" id="character-right">
+    <div class="bubble-tip" id="tip-right">
+        <span class="tip-v" id="tip-right-text"></span>
+    </div>
+</div>
+
+<div class="bar-zone">
+    <div class="bar-head">
+        <div id="status">
+            Préparation
+            <span class="dots"><span></span><span></span><span></span></span>
+        </div>
+        <div id="percent">0%</div>
+    </div>
+
+    <div class="stat-bar-container">
+        <div id="fill"></div>
+    </div>
+
+    <div class="bar-foot">
+        <span id="filename">En attente du serveur…</span>
+        <span id="files">0 / 0</span>
+    </div>
+</div>
+
+<script>
+(function(){
+    var images = ['media/1.png','media/2.png','media/3.png','media/4.png','media/5.png'];
+    var box = document.getElementById('slideshow');
+    var slides = [];
+    for (var i = 0; i < images.length; i++) {
+        var s = document.createElement('div');
+        s.className = 'slide';
+        s.style.backgroundImage = "url('" + images[i] + "')";
+        s.style.animationDelay = (-i * 3) + 's';
+        box.appendChild(s);
+        slides.push(s);
+    }
+    if (!slides.length) return;
+    var cur = 0;
+    slides[0].className = 'slide active';
+    if (slides.length > 1) {
+        setInterval(function(){
+            slides[cur].className = 'slide';
+            cur = (cur + 1) % slides.length;
+            slides[cur].className = 'slide active';
+        }, 5000);
+    }
+})();
+
+var POLICE_IMG = 'https://i.imgur.com/rxTXtqp.png';
+var MAFIA_IMG  = 'https://i.imgur.com/7bhysfK.png';
+
+var TIPS_LEGAL = [
+    "Appuie sur F4 pour choisir ton métier et toucher un salaire.",
+    "Achète et verrouille ta porte pour sécuriser ta maison.",
+    "NLR : une fois mort, tu oublies ta vie d'avant. On ne revient pas.",
+    "Pas de RDM ni de VDM. Le staff connaît déjà ton pseudo.",
+    "Utilise /911 pour appeler la police. On répond... parfois.",
+    "Maintiens C pour ouvrir le menu contextuel (Physgun, etc.).",
+    "Une imprimante à billets chez toi ? Illégal. Je confisque.",
+    "Reste en RP : ton perso ne dit pas \"lol\" en pleine fusillade.",
+    "Range ton arme en ville, le port visible c'est l'amende directe."
+];
+
+var TIPS_ILLEGAL = [
+    "Les money printers rapportent gros, mais surchauffent : surveille-les.",
+    "Crochète au lockpick, mais respecte les règles de raid du serveur.",
+    "Planque tes imprimantes au fond de la base, pas devant la porte.",
+    "Vends ta came discrètement, loin des yeux des bleus.",
+    "Fais /advert ton raid si le serveur l'exige, sinon c'est warn.",
+    "Un keypad cracker ouvre les bases blindées. Presque magique.",
+    "Base raidable obligatoire : les fading doors abusées = ban.",
+    "Garde le minimum de cash sur toi. La fouille, ça existe.",
+    "Le kidnapping paie bien... si la victime arrête de hurler.",
+    "Une planque sans issue de secours, c'est une cellule en avance.",
+    "Ton pote te balance toujours. Choisis bien ton équipe."
+];
+
+(function(){
+    var SHOW_TIME = 7000;
+    var GAP_TIME  = 800;
+
+    function makeActor(boxId, cls, bubbleId, textId, img, tips) {
+        var box = document.getElementById(boxId);
+        var bubble = document.getElementById(bubbleId);
+        var text = document.getElementById(textId);
+        if (!box) return null;
+        var im = document.createElement('img');
+        im.src = img;
+        box.appendChild(im);
+        return {
+            box: box, bubble: bubble, text: text,
+            base: cls, bubbleBase: 'bubble-tip' + (cls.indexOf('left') !== -1 ? ' left' : ''),
+            tips: tips, ti: Math.floor(Math.random() * tips.length)
+        };
+    }
+
+    var actors = [
+        makeActor('character-left',  'character left', 'tip-left',  'tip-left-text',  POLICE_IMG, TIPS_LEGAL),
+        makeActor('character-right', 'character',      'tip-right', 'tip-right-text', MAFIA_IMG,  TIPS_ILLEGAL)
+    ].filter(function(a){ return a; });
+    if (!actors.length) return;
+
+    function show(a) {
+        a.text.textContent = a.tips[a.ti % a.tips.length];
+        a.ti++;
+        a.bubble.className = a.bubbleBase + ' swap';
+        setTimeout(function(){ a.bubble.className = a.bubbleBase; }, 500);
+        a.box.className = a.base + ' shown';
+    }
+    function hide(a) { a.box.className = a.base; }
+
+    var idx = -1;
+    function cycle() {
+        idx = (idx + 1) % actors.length;
+        var a = actors[idx];
+        show(a);
+        setTimeout(function(){
+            hide(a);
+            setTimeout(cycle, GAP_TIME);
+        }, SHOW_TIME);
+    }
+
+    window.startCharacters = cycle;
+})();
+
+(function(){
+    var w = document.getElementById('welcome');
+    var go = function(){ if (window.startCharacters) window.startCharacters(); };
+    if (!w) { go(); return; }
+    setTimeout(function(){
+        w.className = 'welcome hide';
+        go();
+        setTimeout(function(){ w.style.display = 'none'; }, 900);
+    }, 3000);
+})();
+
+var totalFiles  = 0;
+var neededFiles = 0;
+
+function setProgress(pct) {
+    pct = Math.max(0, Math.min(100, pct));
+    document.getElementById('fill').style.width = pct + '%';
+    document.getElementById('percent').textContent = Math.round(pct) + '%';
+}
+
+function refreshFiles() {
+    var done = Math.max(0, totalFiles - neededFiles);
+    document.getElementById('files').textContent = done + ' / ' + totalFiles;
+    if (totalFiles > 0) setProgress(done / totalFiles * 100);
+}
+
+function setStatus(txt) {
+    var el = document.getElementById('status');
+    el.firstChild.nodeValue = txt + ' ';
+}
+
+// Traduction des vrais statuts renvoyés par Garry's Mod (SetStatusChanged).
+// On normalise (minuscules, sans points de suspension) puis on cherche une
+// correspondance ; sinon on affiche le texte brut tel quel.
+var STATUS_FR = {
+    'retrieving server info': 'Récupération des infos du serveur',
+    'sending client info':    'Envoi des infos client',
+    'receiving server info':  'Réception des infos du serveur',
+    'connecting':             'Connexion au serveur',
+    'connecting to server':   'Connexion au serveur',
+    'workshop complete':      'Workshop terminé',
+    'downloading':            'Téléchargement',
+    'downloading files':      'Téléchargement des fichiers',
+    'extracting':             'Extraction des fichiers',
+    'loading':                'Chargement',
+    'starting lua':           'Démarrage de Lua',
+    'sending client data':    'Envoi des données client',
+    'spawning':               'Apparition dans le monde',
+    'getting server info':    'Récupération des infos du serveur',
+    'parsing game info':      'Analyse des infos de partie'
+};
+
+function translateStatus(raw) {
+    var key = String(raw).toLowerCase().replace(/[.…\s]+$/, '').trim();
+    return STATUS_FR[key] || raw;
+}
+
+// Vrai statut envoyé par le serveur — c'est lui qui pilote la ligne de status.
+window.SetStatusChanged = function(status) {
+    if (status) setStatus(translateStatus(status));
+};
+
+function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+    document.getElementById('filename').textContent = 'Vérification des ressources…';
+}
+
+function SetFilesTotal(total) {
+    totalFiles = total || 0;
+    refreshFiles();
+}
+
+function SetFilesNeeded(needed) {
+    neededFiles = needed || 0;
+    refreshFiles();
+    if (neededFiles <= 0 && totalFiles > 0) {
+        document.getElementById('filename').textContent = 'Presque prêt — bon jeu ! 🎉';
+        setProgress(100);
+    }
+}
+
+function DownloadingFile(filename) {
+    if (!filename) return;
+    filename = String(filename).replace(/<\/?[^>]+(>|$)/g, '');
+    document.getElementById('filename').textContent = '⬇  ' + filename;
+}
+
 if (typeof window !== 'undefined' && !window.gmod) {
     if (location.search.indexOf('demo') !== -1 || location.protocol === 'file:') {
         window.SetStatusChanged('Retrieving server info');
