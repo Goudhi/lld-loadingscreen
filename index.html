@@ -403,22 +403,50 @@ function setStatus(txt) {
     el.firstChild.nodeValue = txt + ' ';
 }
 
+// Traduction des vrais statuts renvoyés par Garry's Mod (SetStatusChanged).
+// On normalise (minuscules, sans points de suspension) puis on cherche une
+// correspondance ; sinon on affiche le texte brut tel quel.
+var STATUS_FR = {
+    'retrieving server info': 'Récupération des infos du serveur',
+    'sending client info':    'Envoi des infos client',
+    'receiving server info':  'Réception des infos du serveur',
+    'connecting':             'Connexion au serveur',
+    'connecting to server':   'Connexion au serveur',
+    'workshop complete':      'Workshop terminé',
+    'downloading':            'Téléchargement',
+    'downloading files':      'Téléchargement des fichiers',
+    'extracting':             'Extraction des fichiers',
+    'loading':                'Chargement',
+    'starting lua':           'Démarrage de Lua',
+    'sending client data':    'Envoi des données client',
+    'spawning':               'Apparition dans le monde',
+    'getting server info':    'Récupération des infos du serveur',
+    'parsing game info':      'Analyse des infos de partie'
+};
+
+function translateStatus(raw) {
+    var key = String(raw).toLowerCase().replace(/[.…\s]+$/, '').trim();
+    return STATUS_FR[key] || raw;
+}
+
+// Vrai statut envoyé par le serveur — c'est lui qui pilote la ligne de status.
+window.SetStatusChanged = function(status) {
+    if (status) setStatus(translateStatus(status));
+};
+
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-    setStatus('Connexion établie');
     document.getElementById('filename').textContent = 'Vérification des ressources…';
 }
 
 function SetFilesTotal(total) {
     totalFiles = total || 0;
     refreshFiles();
-    if (totalFiles > 0) setStatus('Téléchargement');
 }
 
 function SetFilesNeeded(needed) {
     neededFiles = needed || 0;
     refreshFiles();
     if (neededFiles <= 0 && totalFiles > 0) {
-        setStatus('Lancement de la partie');
         document.getElementById('filename').textContent = 'Presque prêt — bon jeu ! 🎉';
         setProgress(100);
     }
@@ -432,8 +460,10 @@ function DownloadingFile(filename) {
 
 if (typeof window !== 'undefined' && !window.gmod) {
     if (location.search.indexOf('demo') !== -1 || location.protocol === 'file:') {
+        window.SetStatusChanged('Retrieving server info');
         GameDetails('Serveur LaLaLand', '', 'gm_construct', 64, '', 'sandbox');
         var t = 80, n = 80;
+        setTimeout(function(){ window.SetStatusChanged('Downloading'); }, 700);
         SetFilesTotal(t);
         SetFilesNeeded(n);
         var demo = setInterval(function(){
@@ -442,6 +472,8 @@ if (typeof window !== 'undefined' && !window.gmod) {
             SetFilesNeeded(n);
             DownloadingFile('materials/cartoon/asset_' + (t - n) + '.vtf');
         }, 350);
+        setTimeout(function(){ window.SetStatusChanged('Starting Lua...'); }, 9000);
+        setTimeout(function(){ window.SetStatusChanged('Spawning'); }, 11000);
     }
 }
 </script>
