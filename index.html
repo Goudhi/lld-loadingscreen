@@ -308,6 +308,8 @@ body {
             slides[cur].className = 'slide';
             cur = (cur + 1) % slides.length;
             slides[cur].className = 'slide active';
+            // Prévient le reste de la page que le fond vient de changer.
+            if (typeof window.onSlideChange === 'function') window.onSlideChange(cur);
         }, 5000);
     }
 })();
@@ -342,9 +344,6 @@ var TIPS_ILLEGAL = [
 ];
 
 (function(){
-    var SHOW_TIME = 7000;
-    var GAP_TIME  = 800;
-
     function makeActor(boxId, cls, bubbleId, textId, img, tips) {
         var box = document.getElementById(boxId);
         var bubble = document.getElementById(bubbleId);
@@ -376,17 +375,19 @@ var TIPS_ILLEGAL = [
     function hide(a) { a.box.className = a.base; }
 
     var idx = -1;
-    function cycle() {
+    // Passe au personnage suivant : cache l'actuel et affiche le prochain.
+    // Appelé une première fois au démarrage, puis à chaque changement de fond.
+    function next() {
+        if (idx >= 0) hide(actors[idx]);
         idx = (idx + 1) % actors.length;
-        var a = actors[idx];
-        show(a);
-        setTimeout(function(){
-            hide(a);
-            setTimeout(cycle, GAP_TIME);
-        }, SHOW_TIME);
+        show(actors[idx]);
     }
 
-    window.startCharacters = cycle;
+    window.startCharacters = function(){
+        next();
+        // Synchronise le changement de personnage sur le changement de fond.
+        window.onSlideChange = next;
+    };
 })();
 
 (function(){
